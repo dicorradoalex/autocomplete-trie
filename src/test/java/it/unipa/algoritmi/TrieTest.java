@@ -79,7 +79,7 @@ class TrieTest {
             trie.insert(s);
         }
 
-        // Verifica del Teorema di Slide 14: ||R|| = 28, ELCP(R) = 11 -> Nodi = 18
+        // Verifica del Teorema: ||R|| = 28, ELCP(R) = 11 -> Nodi = 18
         assertEquals(18, trie.countNodes());
         assertEquals(List.of("ali", "alice"), trie.searchByPrefix("ali"));
         assertEquals(List.of("eliana", "elias", "elisa"), trie.searchByPrefix("eli"));
