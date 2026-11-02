@@ -2,11 +2,6 @@ package it.unipa.algoritmi;
 
 /**
  * Rappresenta un nodo della struttura dati Trie.
- * Riferimenti teorici:
- * - Slide 12: Ogni nodo ha al piu' |Sigma| figli, con archi etichettati con simboli di Sigma.
- * - Slide 17, riga (5): Create new node u (initializes child(u,c) to \perp for all c in Sigma).
- * - Slide 17, riga (8): Mark v as representative of S.
- * - Slide 18: Ogni nodo e' implementato con un |Sigma|-sized array.
  */
 public class TrieNode {
 
@@ -19,7 +14,7 @@ public class TrieNode {
 
     /**
      * Array di dimensione |Sigma| contenente i puntatori ai nodi figli.
-     * Il valore null corrisponde al simbolo teorico \perp (assenza di arco uscente).
+     * Il valore null corrisponde al simbolo di terminazione (assenza di arco uscente).
      */
     final TrieNode[] children;
 
@@ -32,7 +27,7 @@ public class TrieNode {
      * Costruisce un nuovo nodo u inizializzando child(u, c) a \perp (null) per ogni c in Sigma.
      */
     public TrieNode() {
-        this.children = new TrieNode[ALPHABET_SIZE]; // In Java tutti gli elementi sono inizializzati a null (\perp)
+        this.children = new TrieNode[ALPHABET_SIZE];
         this.isRepresentative = false;
     }
 
@@ -79,7 +74,6 @@ public class TrieNode {
 
     /**
      * Marca il nodo corrente come rappresentativo di una stringa S dell'insieme R
-     * (Slide 17, passo 8: "Mark v as representative of S").
      */
     public void markAsRepresentative() {
         this.isRepresentative = true;

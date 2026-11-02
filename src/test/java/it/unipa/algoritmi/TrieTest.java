@@ -141,4 +141,73 @@ class TrieTest {
         // Prefisso più lungo della parola memorizzata
         assertTrue(trie.searchByPrefix("canile").isEmpty());
     }
+
+    @Test
+    @DisplayName("Integrazione I/O: Verifica output esatto dell'esempio nella traccia d'esame")
+    void testMainInputOutputExamExample() {
+        String inputTraccia = String.join("\n",
+                "5",
+                "cane",
+                "casa",
+                "casale",
+                "castello",
+                "gatto",
+                "PREFIX ca",
+                "INSERT camion",
+                "PREFIX cam"
+        );
+
+        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(
+                inputTraccia.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
+        java.io.ByteArrayOutputStream outBuffer = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream out = new java.io.PrintStream(outBuffer, true, java.nio.charset.StandardCharsets.UTF_8);
+
+        Main.processInput(in, out);
+
+        String expectedOutput = String.join(System.lineSeparator(),
+                "Suggerimenti per ca:",
+                "cane",
+                "casa",
+                "casale",
+                "castello",
+                "Parola inserita: camion",
+                "Suggerimenti per cam:",
+                "camion"
+        ) + System.lineSeparator();
+
+        assertEquals(expectedOutput, outBuffer.toString(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    @Test
+    @DisplayName("Integrazione I/O: Gestione ricerca senza risultati e parole duplicate da comandi")
+    void testMainNoResultsAndDuplicates() {
+        String input = String.join("\n",
+                "2",
+                "cane",
+                "casa",
+                "INSERT cane",
+                "PREFIX ca",
+                "PREFIX xyz"
+        );
+
+        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(
+                input.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
+        java.io.ByteArrayOutputStream outBuffer = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream out = new java.io.PrintStream(outBuffer, true, java.nio.charset.StandardCharsets.UTF_8);
+
+        Main.processInput(in, out);
+
+        String expectedOutput = String.join(System.lineSeparator(),
+                "Parola inserita: cane",
+                "Suggerimenti per ca:",
+                "cane",
+                "casa",
+                "Suggerimenti per xyz:",
+                "(nessun suggerimento)"
+        ) + System.lineSeparator();
+
+        assertEquals(expectedOutput, outBuffer.toString(java.nio.charset.StandardCharsets.UTF_8));
+    }
 }

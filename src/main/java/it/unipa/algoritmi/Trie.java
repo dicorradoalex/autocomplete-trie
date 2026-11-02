@@ -6,12 +6,6 @@ import java.util.List;
 
 /**
  * Implementazione della struttura dati Trie per il completamento automatico.
- * Riferimenti teorici:
- * - Slide 12: Definizione di trie(R) come albero ordinato radicato con archi etichettati su Sigma.
- * - Slide 14: Teorema sul numero di nodi in trie(R) = ||R|| - ELCP(R) + 1.
- * - Slide 17: Algoritmo di inserimento in un Trie.
- * - Slide 18-20: Implementazione con array di taglia |Sigma| e complessita' O(|s|).
- * - Slide 30-31: Prefix query per autocompletamento.
  */
 public class Trie {
 
@@ -34,8 +28,8 @@ public class Trie {
     }
 
     /**
-     * Restituisce il figlio del nodo v associato al carattere c, ovvero child(v, c) (Slide 17).
-     * Ritorna null (\perp) se non esiste un arco uscente da v etichettato con c.
+     * Restituisce il figlio del nodo v associato al carattere c, ovvero child(v, c).
+     * Ritorna null se non esiste un arco uscente da v etichettato con c.
      * Costo: O(1).
      *
      * @param v il nodo corrente
@@ -48,7 +42,7 @@ public class Trie {
     }
 
     /**
-     * Imposta il nodo u come figlio di v associato al carattere c: child(v, c) <- u (Slide 17, riga 6).
+     * Imposta il nodo u come figlio di v associato al carattere c: child(v, c) <- u.
      * Costo: O(1).
      *
      * @param v il nodo padre
@@ -61,16 +55,7 @@ public class Trie {
     }
 
     /**
-     * Inserisce una stringa S[0..m) nel Trie seguendo fedelmente lo pseudocodice di Slide 17:
-     * (1) v <- root; j <- 0
-     * (2) while child(v, S[j]) != \perp do
-     * (3)     v <- child(v, S[j]); j <- j + 1
-     * (4) while j < m do
-     * (5)     Create new node u (initializes child(u,c) to \perp for all c in Sigma)
-     * (6)     child(v, S[j]) <- u
-     * (7)     v <- u; j <- j + 1
-     * (8) Mark v as representative of S
-     *
+     * Inserisce una stringa S[0..m) nel Trie.
      * Costo temporale: O(|S|).
      * Se S e' gia' presente (parola duplicata), non vengono creati nuovi nodi.
      *
@@ -97,34 +82,25 @@ public class Trie {
             }
         }
 
-        // (1) v <- root; j <- 0
         TrieNode v = this.root;
         int j = 0;
 
-        // (2) while child(v, S[j]) != \perp do
-        // (3)     v <- child(v, S[j]); j <- j + 1
         while (j < m && child(v, normalized.charAt(j)) != null) {
             v = child(v, normalized.charAt(j));
             j = j + 1;
         }
 
-        // (4) while j < m do
         while (j < m) {
-            // (5) Create new node u (initializes child(u,c) to \perp for all c in Sigma)
             TrieNode u = new TrieNode();
-            // (6) child(v, S[j]) <- u
             setChild(v, normalized.charAt(j), u);
-            // (7) v <- u; j <- j + 1
             v = u;
             j = j + 1;
         }
-
-        // (8) Mark v as representative of S
         v.markAsRepresentative();
     }
 
     /**
-     * Prefix query (Slide 30-31): Trova tutte le stringhe di R che hanno prefix come prefisso,
+     * Prefix query: Trova tutte le stringhe di R che hanno prefix come prefisso,
      * restituendole ordinate alfabeticamente senza effettuare una scansione sequenziale dell'intero dizionario.
      *
      * @param prefix il prefisso da cercare
@@ -151,7 +127,7 @@ public class Trie {
             }
             v = child(v, c);
             if (v == null) {
-                // Ricerca senza risultati: il cammino si interrompe (child(v, c) == \perp)
+                // Ricerca senza risultati: il cammino si interrompe (child(v, c) == null)
                 return Collections.emptyList();
             }
         }
@@ -190,7 +166,7 @@ public class Trie {
     }
 
     /**
-     * Conta il numero totale di nodi presenti nel Trie (utile per verificare il Teorema di Slide 14:
+     * Conta il numero totale di nodi presenti nel Trie:
      * numero di nodi = ||R|| - ELCP(R) + 1).
      *
      * @return il numero totale di nodi in trie(R)

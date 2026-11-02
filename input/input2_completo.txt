@@ -1,0 +1,13 @@
+6
+ali
+alice
+anna
+eliana
+elias
+elisa
+PREFIX ali
+PREFIX eli
+INSERT ali
+INSERT elite
+PREFIX eli
+PREFIX zzz

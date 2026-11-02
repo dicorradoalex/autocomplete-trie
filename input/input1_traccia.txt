@@ -1,0 +1,9 @@
+5
+cane
+casa
+casale
+castello
+gatto
+PREFIX ca
+INSERT camion
+PREFIX cam
