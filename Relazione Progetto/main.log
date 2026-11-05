@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.11.2)  4 NOV 2026 22:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.11.2)  5 NOV 2026 15:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1023,7 +1023,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 ] [3] [4]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 109.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 115.
  [5] [6]
 (C:\Users\dicor\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
@@ -1032,7 +1032,7 @@ File: lstlang1.sty 2025/11/14 1.11b listings language file
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <9> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 178.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 180.
 
 [7] (main.aux)
  ***********
@@ -1040,23 +1040,23 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: BE559307446F92501916280685838F49;3648.
+(rerunfilecheck)             Checksum: AB365AC13D3D487591A3F9543542D20A;3998.
  ) 
 Here is how much of TeX's memory you used:
- 31066 strings out of 467871
- 608568 string characters out of 5418376
- 1189745 words of memory out of 5000000
- 59438 multiletter control sequences out of 15000+600000
+ 31068 strings out of 467871
+ 608620 string characters out of 5418376
+ 1194321 words of memory out of 5000000
+ 59440 multiletter control sequences out of 15000+600000
  643895 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,6n,108p,1429b,1379s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,6n,108p,1394b,1292s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
 0900.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
 0\ecrm0600.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\tcrm1095.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
-pen/ec/dpi600\ecbx1200.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour
-/jknappen/ec/dpi600\ectt1095.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/
-ljfour/jknappen/ec/dpi600\ecti1095.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fon
+pen/ec/dpi600\ectt1095.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecti1095.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fonts/pk/
+ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\dicor\AppData\Local\MiKTeX\fon
 ts/pk/ljfour/jknappen/ec/dpi600\ecrm1095.pk> <C:\Users\dicor\AppData\Local\MiKT
 eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\dicor\AppData\Loca
 l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\dicor\AppDat
@@ -1069,9 +1069,9 @@ s/cm/cmmi8.pfb><C:/Users/dicor/AppData/Local/Programs/MiKTeX/fonts/type1/public
 /amsfonts/cm/cmr10.pfb><C:/Users/dicor/AppData/Local/Programs/MiKTeX/fonts/type
 1/public/amsfonts/cm/cmsy10.pfb><C:/Users/dicor/AppData/Local/Programs/MiKTeX/f
 onts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on main.pdf (7 pages, 219804 bytes).
+Output written on main.pdf (7 pages, 220634 bytes).
 PDF statistics:
- 575 PDF objects out of 1000 (max. 8388607)
+ 580 PDF objects out of 1000 (max. 8388607)
  51 named destinations out of 1000 (max. 500000)
- 141 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 157 words of extra memory for PDF output out of 10000 (max. 10000000)
 

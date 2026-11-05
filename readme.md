@@ -29,66 +29,69 @@ inserimento, autocompletamento, ordinamento, gestione di duplicati e assenza di 
 ## Struttura del Repository
 
 ```text
-autocomplete-trie/
+AutocompleteTrie/
 ├── pom.xml                         # Configurazione Maven e dipendenze (JUnit 5)
-├── README.md                       # Documentazione del progetto
+├── readme.md                       # Documentazione del progetto
 ├── input/                          # File di input per i test
-│   ├── input1_traccia.txt          # Input d'esempio della traccia d'esame
-│   └── input2_completo.txt         # Input di prova con casi limite (duplicati, no match)
+│   ├── input1_traccia.txt          # Esempio fornito dalla traccia d'esame
+│   └── input2_completo.txt         # Casi limite (duplicati, no match, prefisso completo)
+├── Relazione Progetto/             # relazione
+│   ├── main.pdf                    # Relazione finale compilata in formato PDF
+│   ├── main.tex                    # Sorgente LaTeX della relazione
+│   └── common.sty                  # Foglio di stile e pacchetti LaTeX
 └── src/
     ├── main/java/it/unipa/algoritmi/
-    │   ├── TrieNode.java           # Struttura del nodo del Trie
-    │   ├── Trie.java               # Logica dell'albero e algoritmi di ricerca
-    │   └── Main.java               # Gestione I/O ed elaborazione comandi
+    │   ├── TrieNode.java           # Struttura del nodo del Trie (|Sigma| = 26)
+    │   ├── Trie.java               # Logica dell'albero e algoritmi (insert, searchByPrefix, DFS)
+    │   └── Main.java               # Gestione I/O ed elaborazione comandi (PREFIX, INSERT)
     └── test/java/it/unipa/algoritmi/
-        └── TrieTest.java           # Test unitari (JUnit 5)
+        └── TrieTest.java           # Suite di test automatizzati (JUnit 5)
 ```
 
 ---
 
 ## Prerequisiti
 
-* **Java Development Kit (JDK)**: versione 18 o superiore.
-* **Apache Maven**: per la gestione della compilazione e delle dipendenze (oppure IntelliJ IDEA con Maven integrato).
+* **Java Development Kit (JDK)**: versione 18 (o compatibile con Java 17 LTS).
+* **Apache Maven**: versione 3.6 o superiore (oppure IntelliJ IDEA con supporto Maven integrato).
 
 ---
 
 ## Compilazione ed Esecuzione
 
 ### 1. Compilazione del Progetto
-Dal terminale nella cartella del progetto:
+Dal terminale nella cartella radice del progetto:
 ```bash
 mvn clean compile
 ```
 
 ### 2. Esecuzione dei Test (JUnit 5)
-Per lanciare i test automatici:
+Per lanciare la suite di test automatizzati:
 ```bash
 mvn test
 ```
 
-### 3. Esecuzione con File di Input (Opzione A - Consigliata)
-Per eseguire il programma utilizzando uno dei due file di test preconfigurati e visualizzare subito l'output:
+### 3. Esecuzione del Programma
+L'applicazione supporta tre modalità di esecuzione, a seconda di come viene fornito il flusso di input:
 
-* **Test con input1_traccia.txt (esempio dato della traccia d'esame):**:
-  ```powershell
+* **Modalità 1 – Esempio della Traccia d'Esame:**
+  Esegue l'esempio fornito nella traccia per verificare il flusso base di popolamento e completamento:
+  ```bash
   java -cp target/classes it.unipa.algoritmi.Main input/input1_traccia.txt
   ```
 
-* **Test con input2_completo.txt (casi limite: prefissi completi, duplicati, ricerche vuote):**:
-
-  ```powershell
+* **Modalità 2 – Casi Limite (Prefissi Completi, Duplicati, No Match):**
+  Testa le casistiche limite, inclusi duplicati, ricerche senza corrispondenza e prefissi coincidenti con parole complete:
+  ```bash
   java -cp target/classes it.unipa.algoritmi.Main input/input2_completo.txt
   ```
 
-### Esecuzione Interattiva da Console (Opzione B - Alternativa manuale)
-In alternativa all'uso dei file, è possibile avviare il programma e digitare i comandi direttamente da tastiera:
-
-```powershell
-java -cp target/classes it.unipa.algoritmi.Main
-```
-
-Formato atteso in console:
-1. Prima riga: numero intero $N$ di parole iniziali.
-2. Successive $N$ righe: una parola per riga.
-3. Righe seguenti: comandi `PREFIX <prefisso>` oppure `INSERT <parola>`.
+* **Modalità 3 – Interattiva da Console:**
+  Avviando il programma senza argomenti, l'input viene acquisito direttamente da tastiera tramite lo standard input:
+  ```bash
+  java -cp target/classes it.unipa.algoritmi.Main
+  ```
+  Formato atteso:
+  1. Prima riga: numero intero *N* di parole iniziali.
+  2. Successive *N* righe: una parola per riga da inserire nel Trie.
+  3. Righe seguenti: comandi `PREFIX <prefisso>` oppure `INSERT <parola>`.

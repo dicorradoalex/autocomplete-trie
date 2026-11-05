@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Implementazione della struttura dati Trie.
+ * Implementazione della struttura dati Trie per il completamento automatico.
  */
 public class Trie {
 
     private final TrieNode root;
 
     /**
-     * Inizializza un Trie vuoto con solamente il nodo radice.
+     * Inizializza un Trie vuoto creando il solo nodo radice.
      */
     public Trie() {
         this.root = new TrieNode();
@@ -21,20 +21,18 @@ public class Trie {
     /**
      * Restituisce la radice del Trie.
      *
-     * @return il nodo root
+     * @return il nodo radice (root)
      */
     public TrieNode getRoot() {
         return this.root;
     }
 
     /**
-     * Restituisce il figlio del nodo v associato al carattere c, ovvero child(v, c).
-     * Ritorna null se non esiste un arco uscente da v etichettato con c.
-     * Costo: O(1).
+     * Restituisce il nodo figlio associato al carattere c (null se l'arco non esiste).
      *
-     * @param v il nodo corrente
-     * @param c il carattere dell'alfabeto Sigma = {'a'..'z'}
-     * @return il nodo figlio corrispondente, oppure null (\perp)
+     * @param v il nodo di partenza
+     * @param c il carattere dell'arco
+     * @return il nodo figlio corrispondente oppure null
      */
     public TrieNode child(TrieNode v, char c) {
         int index = TrieNode.charToIndex(c);
@@ -42,12 +40,11 @@ public class Trie {
     }
 
     /**
-     * Imposta il nodo u come figlio di v associato al carattere c: child(v, c) <- u.
-     * Costo: O(1).
+     * Collega il nodo u come figlio di v per il carattere c.
      *
      * @param v il nodo padre
      * @param c il carattere dell'arco
-     * @param u il nuovo nodo figlio
+     * @param u il nodo figlio da collegare
      */
     private void setChild(TrieNode v, char c, TrieNode u) {
         int index = TrieNode.charToIndex(c);
@@ -55,26 +52,25 @@ public class Trie {
     }
 
     /**
-     * Inserisce una stringa S[0..m) nel Trie.
-     * Costo temporale: O(|S|).
-     * Se S e' gia' presente (parola duplicata), non vengono creati nuovi nodi.
+     * Inserisce una parola nel Trie.
      *
      * @param S la parola da inserire
-     * @throws IllegalArgumentException se S e' null, vuota o contiene caratteri fuori da Sigma
+     * @throws IllegalArgumentException se S e' null, vuota o contiene caratteri non validi
      */
     public void insert(String S) {
-        // logica di validazione
+        // Controllo che la stringa non sia null
         if (S == null) {
             throw new IllegalArgumentException("La stringa da inserire non puo' essere null.");
         }
 
+        // Rimuove spazi bianchi all'inizio e alla fine e converte in minuscolo
         String normalized = S.trim().toLowerCase();
         int m = normalized.length();
         if (m == 0) {
             throw new IllegalArgumentException("La stringa da inserire non puo' essere vuota.");
         }
 
-        // Verifica che tutti i caratteri appartengano a Sigma = {'a'..'z'}
+        // Verifica che ogni carattere appartenga all'alfabeto supportato ['a'..'z']
         for (int i = 0; i < m; i++) {
             if (!TrieNode.isValidChar(normalized.charAt(i))) {
                 throw new IllegalArgumentException(
@@ -83,101 +79,102 @@ public class Trie {
             }
         }
 
-        // logica di inserimento
         TrieNode v = this.root;
         int j = 0;
 
-        // Naviga il prefisso comune esistente
-
-        // fino a quando non esaurisco la stringa da inserire e v ha un figlio con arco uscente con carattere corrispondente a quello della stringa
+        // Scorre i nodi già esistenti finché trova i caratteri del prefisso comune
         while (j < m && child(v, normalized.charAt(j)) != null) {
-            v = child(v, normalized.charAt(j)); // fa scendere il puntatore v lungo l'arco esistente (passaggio padre-figlio)
-            j = j + 1; // incrementa j per per leggere la lettera successiva della stringa
+            v = child(v, normalized.charAt(j));
+            j = j + 1;
         }
 
-        // Fase di creazione
-
-        // fino a quando non esaurisco la stringa da inserire
+        // Alloca i nuovi nodi per i caratteri rimanenti della parola
         while (j < m) {
-            TrieNode u = new TrieNode(); // crea un nuovo nodo vuoto
-            setChild(v, normalized.charAt(j), u); //  collega il vecchio nodo v al nuovo nodo u attraverso l'arco etichettato con la lettera corrente
-            v = u; // sposta il riferimento v sul nuovo nodo appena creato u (che diventa padre del prossimo carattere)
-            j = j + 1; // incrementa j per avanzare alla lettera successiva della parola
+            TrieNode u = new TrieNode();
+            setChild(v, normalized.charAt(j), u);
+            v = u;
+            j = j + 1;
         }
-        v.markAsRepresentative(); // v è l'ultimo carattere della parola inserita -> flegga come rappresentativo
+
+        // Marca il nodo finale per indicare che rappresenta una parola completa
+        v.markAsRepresentative();
     }
 
     /**
-     * Prefix query: Trova tutte le stringhe di R che hanno prefix come prefisso,
-     * restituendole ordinate alfabeticamente senza effettuare una scansione sequenziale dell'intero dizionario.
+     * Restituisce tutte le parole presenti nel Trie che iniziano con il prefisso indicato,
+     * ordinate alfabeticamente.
      *
      * @param prefix il prefisso da cercare
-     * @return lista ordinata alfabeticamente delle parole che iniziano con prefix (vuota se nessun match)
+     * @return lista ordinata dei suggerimenti (vuota se non ci sono corrispondenze)
      */
     public List<String> searchByPrefix(String prefix) {
         if (prefix == null) {
             return Collections.emptyList();
         }
 
+        // Rimuove spazi esterni e converte in minuscolo
         String normalizedPrefix = prefix.trim().toLowerCase();
         int pLen = normalizedPrefix.length();
         if (pLen == 0) {
             return Collections.emptyList();
         }
 
-        // Fase 1: Discesa nel Trie lungo i caratteri del prefisso in O(|prefix|)
+        // Fase 1: Segue il cammino dei caratteri del prefisso partendo dalla radice
         TrieNode v = this.root;
         for (int j = 0; j < pLen; j++) {
             char c = normalizedPrefix.charAt(j);
             if (!TrieNode.isValidChar(c)) {
-                // Se il prefisso contiene un carattere fuori dall'alfabeto, non ci sono risultati
+                // Se contiene un carattere fuori dall'alfabeto, non ci sono risultati
                 return Collections.emptyList();
             }
             v = child(v, c);
             if (v == null) {
-                // Ricerca senza risultati: il cammino si interrompe (child(v, c) == null)
+                // Il prefisso non e' presente nel dizionario: restituisce lista vuota
                 return Collections.emptyList();
             }
         }
 
-        // Fase 2: Raccolta ordinata delle parole nel sottoalbero radicato in v tramite visita DFS in pre-ordine
-        List<String> suggestions = new ArrayList<>(); // raccoglierà tutte le parole trovate durante l'esplorazione del sottoalbero
-        StringBuilder currentWord = new StringBuilder(normalizedPrefix); //  buffer di caratteri mutabile con all'interno il prefisso normalizzato
-        collectWordsDFS(v, currentWord, suggestions); // visita DFS  a partire da v, radice del sottoalbero del prefisso
+        // Fase 2: Raccoglie in ordine alfabetico le parole nel sottoalbero con visita DFS
+        List<String> suggestions = new ArrayList<>();
+        StringBuilder currentWord = new StringBuilder(normalizedPrefix);
+        collectWordsDFS(v, currentWord, suggestions);
         return suggestions;
     }
 
     /**
-     * Visita ricorsivamente in pre-ordine il sottoalbero radicato nel nodo u.
-     * Poiche' l'array children e' indicizzato secondo l'ordine alfabetico ['a'..'z'],
-     * i suggerimenti vengono raccolti già in ordine lessicografico crescente.
+     * Visita ricorsivamente in pre-ordine il sottoalbero per estrarre le parole.
+     * L'esplorazione dei figli in ordine ['a'..'z'] garantisce l'ordinamento alfabetico.
      *
-     * @param u           il nodo corrente nella visita del sottoalbero
-     * @param currentWord il buffer contenente i caratteri sul cammino dalla radice a u
-     * @param suggestions la lista in cui accumulare le parole rappresentative trovate
+     * @param u           il nodo corrente nella visita
+     * @param currentWord buffer contenente i caratteri accumulati dalla radice a u
+     * @param suggestions lista su cui accumulare i suggerimenti trovati
      */
     private void collectWordsDFS(TrieNode u, StringBuilder currentWord, List<String> suggestions) {
-        // Se il nodo corrente e' marcato (incluso il nodo stesso del prefisso), aggiungiamo la parola
+        // Se il nodo corrente rappresenta una parola completa, la aggiunge ai suggerimenti
         if (u.isRepresentative()) {
-            suggestions.add(currentWord.toString()); // se si, aggiungi la parola a suggestion
+            suggestions.add(currentWord.toString());
         }
 
-        // Esplorazione ordinata di tutti i possibili archi uscenti per c in Sigma
+        // Esplora i figli in ordine alfabetico (da 'a' a 'z')
         for (int i = 0; i < TrieNode.ALPHABET_SIZE; i++) {
             TrieNode nextNode = u.children[i];
             if (nextNode != null) {
-                currentWord.append(TrieNode.indexToChar(i)); // converte l'indice dell'arco nella lettera corrispondente e attacca la lettera alla fine del buffer
-                collectWordsDFS(nextNode, currentWord, suggestions); //  Chiama se stesso ricorsivamente passando il nodo figlio nextNode e il buffer aggiornato
-                currentWord.deleteCharAt(currentWord.length() - 1); // rimuove l'ultimo carattere aggiunto per ripristinare il prefisso di partenza ed esplorare i rami successivi
+                // Aggiunge la lettera corrispondente all'arco
+                currentWord.append(TrieNode.indexToChar(i));
+
+                // Visita ricorsiva del sottoalbero
+                collectWordsDFS(nextNode, currentWord, suggestions);
+
+                // Backtracking: rimuove l'ultimo carattere per esplorare gli altri rami
+                currentWord.deleteCharAt(currentWord.length() - 1);
             }
         }
     }
 
     /**
-     * Conta il numero totale di nodi presenti nel Trie:
-     * numero di nodi = ||R|| - ELCP(R) + 1).
+     * Conta ricorsivamente il numero totale di nodi presenti nel Trie.
      *
-     * @return il numero totale di nodi in trie(R)
+     * @return il numero complessivo di nodi dell'albero
      */
     public int countNodes() {
         return countNodesRecursive(this.root);
@@ -187,7 +184,7 @@ public class Trie {
         if (u == null) {
             return 0;
         }
-        int count = 1;
+        int count = 1; // conta il nodo corrente
         for (int i = 0; i < TrieNode.ALPHABET_SIZE; i++) {
             if (u.children[i] != null) {
                 count += countNodesRecursive(u.children[i]);

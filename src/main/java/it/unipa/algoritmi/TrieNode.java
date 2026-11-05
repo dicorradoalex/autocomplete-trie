@@ -1,30 +1,23 @@
 package it.unipa.algoritmi;
 
 /**
- * Rappresenta un nodo della struttura dati Trie.
+ * Rappresenta un singolo nodo del Trie.
  */
 public class TrieNode {
 
-    /**
-     * Dichiarazione esplicita dell'insieme di caratteri supportato Sigma = {'a'..'z'}.
-     */
-    public static final char FIRST_CHAR = 'a'; // 'a' -> 97
-    public static final char LAST_CHAR = 'z'; // 'z' -> 122
-    public static final int ALPHABET_SIZE = LAST_CHAR - FIRST_CHAR + 1; // |Sigma| = 26
+    // Alfabeto supportato: 26 lettere minuscole da 'a' a 'z'
+    public static final char FIRST_CHAR = 'a';
+    public static final char LAST_CHAR = 'z';
+    public static final int ALPHABET_SIZE = LAST_CHAR - FIRST_CHAR + 1; // 26 lettere
 
-    /**
-     * Array di dimensione |Sigma| contenente i puntatori ai nodi figli.
-     * Il valore null corrisponde al simbolo di terminazione (assenza di arco uscente).
-     */
+    // Array dei 26 nodi figli (il valore null indica assenza di arco uscente)
     final TrieNode[] children;
 
-    /**
-     * Indica se il cammino dalla radice a questo nodo rappresenta una parola completa in R.
-     */
+    // Indica se il cammino dalla radice a questo nodo forma una parola completa
     private boolean isRepresentative;
 
     /**
-     * Costruisce un nuovo nodo u inizializzando child(u, c) a null per ogni c in Sigma.
+     * Costruttore: crea un nuovo nodo con tutti i 26 figli inizializzati a null.
      */
     public TrieNode() {
         this.children = new TrieNode[ALPHABET_SIZE];
@@ -32,22 +25,21 @@ public class TrieNode {
     }
 
     /**
-     * Verifica se un carattere appartiene all'alfabeto supportato Sigma = {'a'..'z'}.
+     * Verifica se il carattere appartiene all'alfabeto supportato ('a'..'z').
      *
-     * @param c il carattere da verificare
-     * @return true se c appartiene a Sigma, false altrimenti
+     * @param c il carattere da controllare
+     * @return true se appartiene all'alfabeto, false altrimenti
      */
     public static boolean isValidChar(char c) {
         return c >= FIRST_CHAR && c <= LAST_CHAR;
     }
 
     /**
-     * Converte un carattere c in Sigma nel corrispondente indice dell'array [0 .. |Sigma|-1].
-     * Costo: O(1).
+     * Converte un carattere nel corrispondente indice dell'array [0..25]
      *
-     * @param c il carattere dell'alfabeto
-     * @return l'indice nell'array children
-     * @throws IllegalArgumentException se il carattere non appartiene a Sigma
+     * @param c il carattere da convertire ('a'..'z')
+     * @return l'indice nell'array children (0 per 'a', 25 per 'z')
+     * @throws IllegalArgumentException se il carattere non appartiene all'alfabeto
      */
     public static int charToIndex(char c) {
         if (!isValidChar(c)) {
@@ -59,11 +51,10 @@ public class TrieNode {
     }
 
     /**
-     * Converte un indice [0 .. |Sigma|-1] nel corrispondente carattere c in Sigma.
-     * Costo: O(1).
+     * Converte un indice [0..25] nel corrispondente carattere ('a'..'z')
      *
-     * @param index l'indice dell'array children
-     * @return il carattere corrispondente nell'alfabeto Sigma
+     * @param index l'indice dell'array children (da 0 a 25)
+     * @return il carattere corrispondente
      */
     public static char indexToChar(int index) {
         if (index < 0 || index >= ALPHABET_SIZE) {
@@ -73,16 +64,16 @@ public class TrieNode {
     }
 
     /**
-     * Marca il nodo corrente come rappresentativo di una stringa S dell'insieme R
+     * Marca il nodo indicando che qui termina una parola del dizionario.
      */
     public void markAsRepresentative() {
         this.isRepresentative = true;
     }
 
     /**
-     * Restituisce true se il nodo e' marcato come rappresentativo di una parola in R.
+     * Restituisce true se in questo nodo termina una parola completa.
      *
-     * @return true se il nodo rappresenta una parola inserita, false altrimenti
+     * @return true se il nodo rappresenta una parola valida, false altrimenti
      */
     public boolean isRepresentative() {
         return this.isRepresentative;

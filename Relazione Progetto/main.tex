@@ -14,6 +14,7 @@
 
 \section{Introduzione e Specifiche del Problema}
 
+\subsection{Requisiti della Traccia}
 Il progetto richiede la realizzazione in Java di un motore di completamento automatico efficiente basato sulla struttura dati \emph{Trie}, rispettando i seguenti requisiti:
 \begin{enumerate}
     \item inserire un insieme iniziale di parole all'interno del Trie;
@@ -23,6 +24,9 @@ Il progetto richiede la realizzazione in Java di un motore di completamento auto
     \item gestire ricerche prive di risultati e parole duplicate.
 \end{enumerate}
 Inoltre, le specifiche impongono che il sistema non compia alcuna scansione sequenziale del dizionario per individuare i suggerimenti, dichiari esplicitamente l'insieme di caratteri supportato e gestisca correttamente il caso limite in cui il prefisso cercato coincida con una parola già memorizzata.
+
+\subsection{Ambiente di Sviluppo}
+Il software è stato sviluppato all'interno dell'IDE \textbf{IntelliJ IDEA} come progetto \textbf{Maven}, impiegando il compilatore \textbf{JDK 18}. Per verificare il corretto funzionamento del codice è stato integrato il framework di test \textbf{JUnit 5}, senza ricorrere ad alcuna libreria esterna a runtime.
 
 
 \section{Struttura Dati Utilizzata e Implementazione}
@@ -35,8 +39,8 @@ Il Trie standard è stato preferito rispetto alle altre varianti per ragioni di 
 \begin{itemize}
     \item Rispetto al \textbf{Patricia Tree} (\emph{Compact Trie}): pur comprimendo i cammini unari a $O(|R|)$ nodi, il Patricia Tree richiede di mantenere le stringhe in una struttura ausiliaria e rende complessa la gestione degli inserimenti dinamici (\texttt{INSERT}), poiché ogni nuova parola richiede di spezzare archi esistenti e aggiornare i riferimenti alle sottostringhe. Il Trie standard gestisce invece gli inserimenti in modo incrementale, allocando nuovi nodi unicamente dal punto di biforcazione.
     \item Rispetto al \textbf{Ternary Search Trie} (\emph{TST}): il TST impiega tre soli
-    puntatori per nodo ed è vantaggioso su alfabeti estesi, ma la sua altezza dipende
-    dall'ordine di inserimento la quale potrebbe degradare se non bilanciato. Con un alfabeto compatto di sole 26 lettere, il Trie standard garantisce transizioni $O(1)$ per carattere senza alcun bisogno di ribilanciamento e assicura l'ordinamento alfabetico nativo.
+    puntatori per nodo ed è vantaggioso su alfabeti estesi, ma la sua altezza dipende dall'ordine di inserimento e le prestazioni possono degradare se l'albero non è bilanciato. Con
+    un alfabeto compatto di sole 26 lettere, il Trie standard garantisce transizioni $O(1)$ per carattere senza alcun bisogno di ribilanciamento e assicura l'ordinamento alfabetico nativo.
 \end{itemize}
 
 \subsection{Alfabeto Supportato}
@@ -170,29 +174,32 @@ I primi test verificano il corretto funzionamento dei singoli nodi e la gestione
 I test successivi si concentrano sul comportamento del Trie durante gli inserimenti e le ricerche, verificando anche tutti i casi limite previsti. Il metodo \texttt{testNodeCountTheorem} convalida la proprietà teorica sul numero totale di nodi ($||R|| - \text{ELCP}(R) + 1$): inserendo le sei parole d'esempio $R = \{\text{\texttt{ali}}, \text{\texttt{alice}}, \text{\texttt{anna}}, \text{\texttt{eliana}}, \text{\texttt{elias}}, \text{\texttt{elisa}}\}$, il conteggio tramite \texttt{countNodes()} restituisce esattamente $28 - 11 + 1 = 18$ nodi. La gestione dei duplicati viene collaudata da \texttt{testDuplicateWordsHandling}, che accerta come l'inserimento ripetuto di parole già presenti non crei nodi superflui né produca doppioni nell'output. I metodi \texttt{testPrefixIsCompleteWord} e \texttt{testAlphabeticalOrdering} verificano rispettivamente che un prefisso coincidente con una parola completa (come \texttt{casa} rispetto a \texttt{casale}) compaia tra i suggerimenti e che le parole vengano restituite sempre in ordine alfabetico, anche se inserite in ordine sparso o inverso. Infine, \texttt{testSearchWithNoResults} controlla che le ricerche prive di corrispondenza restituiscano immediatamente una lista vuota, mentre \texttt{testExamTraceExample} riproduce fedelmente l'intera sequenza di comandi riportata nella traccia d'esame.
 
 \subsection{Istruzioni per la Compilazione e l'Esecuzione}
-Per verificare il comportamento classe \texttt{Main}, sono forniti due file
-di test nella cartella \texttt{input/}:
-\texttt{input1\_traccia.txt} riproduce l'esempio della dato nella traccia del progetto per verificare
-il flusso base di esecuzione, mentre \texttt{input2\_completo.txt} è stato pensato per testare i casi
-limite del sistema, come prefissi coincidenti con parole complete (ad esempio \texttt{ali} e \texttt{alice}),
-l'inserimento di parole duplicate (\texttt{INSERT ali}) e ricerche
-senza corrispondenze nel dizionario (ad esempio\texttt{PREFIX zzz}).
 
-L'applicazione può essere compilata ed eseguita da terminale tramite i seguenti comandi:
-\begin{enumerate}
-    \item \textbf{Compilazione ed esecuzione dei test automatizzati:}
-    \begin{lstlisting}[language=bash]
+La compilazione del progetto e l'esecuzione dell'intera suite di test automatizzati possono essere avviate da riga di comando tramite Maven:
+\begin{lstlisting}[language=bash]
 mvn clean test
-    \end{lstlisting}
-    \item \textbf{Esecuzione con i file di input:}
-    \begin{lstlisting}[language=bash]
+\end{lstlisting}
+Una volta compilato il codice, l'esecuzione del programma principale (\texttt{Main}) può avvenire secondo tre modalità distinte, a seconda di come viene fornito l'input.
+\\ \\
+La prima modalità prevede l'esecuzione indicando il file \texttt{input1\_traccia.txt}, che riproduce l'esempio fornito
+nella traccia d'esame per verificare il corretto flusso di popolamento e autocompletamento:
+\begin{lstlisting}[language=bash]
 java -cp target/classes it.unipa.algoritmi.Main input/input1_traccia.txt
+\end{lstlisting}
+\vspace{0.8em}
+La seconda modalità utilizza il file \texttt{input2\_completo.txt}, pensato per testare i casi limite,
+tra cui l'inserimento di parole duplicate (\texttt{INSERT ali}), ricerche prive di corrispondenze (\texttt{PREFIX zzz})
+e prefissi coincidenti con parole complete (\texttt{ali} e \texttt{alice}):
+\begin{lstlisting}[language=bash]
 java -cp target/classes it.unipa.algoritmi.Main input/input2_completo.txt
-    \end{lstlisting}
-    \item \textbf{Esecuzione interattiva da console:}
-    \begin{lstlisting}[language=bash]
+\end{lstlisting}
+\vspace{0.8em}
+Infine, la terza modalità è quella \textbf{interattiva da console}:
+il programma legge direttamente dallo standard input (\texttt{System.in}).
+In questo modo l'utente può inserire manualmente da tastiera il numero iniziale di vocaboli,
+le singole parole del dizionario e i successivi comandi \texttt{PREFIX} e \texttt{INSERT}:
+\begin{lstlisting}[language=bash]
 java -cp target/classes it.unipa.algoritmi.Main
-    \end{lstlisting}
-\end{enumerate}
+\end{lstlisting}
 
 \end{document}
