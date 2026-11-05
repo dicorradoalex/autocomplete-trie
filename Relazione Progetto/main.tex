@@ -1,0 +1,198 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{common}
+
+\title{Relazione Progetto di Laboratorio di Algoritmi}
+\author{Alex Di Corrado}
+\date{6 Novembre 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\clearpage
+
+
+\section{Introduzione e Specifiche del Problema}
+
+Il progetto richiede la realizzazione in Java di un motore di completamento automatico efficiente basato sulla struttura dati \emph{Trie}, rispettando i seguenti requisiti:
+\begin{enumerate}
+    \item inserire un insieme iniziale di parole all'interno del Trie;
+    \item ricevere un prefisso e restituire le parole corrispondenti;
+    \item ordinare alfabeticamente i suggerimenti restituiti;
+    \item consentire l'inserimento di nuove parole;
+    \item gestire ricerche prive di risultati e parole duplicate.
+\end{enumerate}
+Inoltre, le specifiche impongono che il sistema non compia alcuna scansione sequenziale del dizionario per individuare i suggerimenti, dichiari esplicitamente l'insieme di caratteri supportato e gestisca correttamente il caso limite in cui il prefisso cercato coincida con una parola già memorizzata.
+
+
+\section{Struttura Dati Utilizzata e Implementazione}
+
+Per realizzare il sistema di completamento automatico è stato scelto il \textbf{Trie standard}. In questa struttura dati ogni nodo rappresenta un prefisso ed è implementato tramite un array di puntatori di dimensione fissa $|\Sigma| = 26$, in cui la contiguità dei codici ASCII permette di mappare direttamente ciascun indice alla corrispondente lettera dell'alfabeto $\Sigma = \{\text{'a'}, \dots, \text{'z'}\}$, a partire dal carattere \texttt{'a'} all'indice 0 fino alla \texttt{'z'} all'indice 25.
+Le parole memorizzate si ottengono concatenando i caratteri lungo il cammino dalla radice ai nodi, mentre un flag booleano (\texttt{isRepresentative}) marca il nodo finale di ogni parola inserita per distinguerla dai prefissi intermedi (ad esempio \texttt{cas} rispetto a \texttt{casa} o \texttt{casale}).
+
+\subsection{Motivazione della scelta}
+Il Trie standard è stato preferito rispetto alle altre varianti per ragioni di efficienza e semplicità legate alle specifiche del problema:
+\begin{itemize}
+    \item Rispetto al \textbf{Patricia Tree} (\emph{Compact Trie}): pur comprimendo i cammini unari a $O(|R|)$ nodi, il Patricia Tree richiede di mantenere le stringhe in una struttura ausiliaria e rende complessa la gestione degli inserimenti dinamici (\texttt{INSERT}), poiché ogni nuova parola richiede di spezzare archi esistenti e aggiornare i riferimenti alle sottostringhe. Il Trie standard gestisce invece gli inserimenti in modo incrementale, allocando nuovi nodi unicamente dal punto di biforcazione.
+    \item Rispetto al \textbf{Ternary Search Trie} (\emph{TST}): il TST impiega tre soli
+    puntatori per nodo ed è vantaggioso su alfabeti estesi, ma la sua altezza dipende
+    dall'ordine di inserimento la quale potrebbe degradare se non bilanciato. Con un alfabeto compatto di sole 26 lettere, il Trie standard garantisce transizioni $O(1)$ per carattere senza alcun bisogno di ribilanciamento e assicura l'ordinamento alfabetico nativo.
+\end{itemize}
+
+\subsection{Alfabeto Supportato}
+L'alfabeto $\Sigma$ è dichiarato nella classe \texttt{TrieNode} e corrisponde alle ventisei lettere minuscole: $\Sigma = \{ \text{'a'}, \text{'b'}, \dots, \text{'z'} \}$, con $|\Sigma| = 26$.
+La corrispondenza bidirezionale tra caratteri e indici dell'array dei figli è gestita in tempo $O(1)$ da due funzioni statiche:
+\texttt{charToIndex(char c)} calcola la differenza numerica $c - \text{'a'}$, restituendo un indice nell'intervallo $[0, 25]$;
+\texttt{indexToChar(int index)} calcola la somma $\text{'a'} + index$, riconvertendo l'indice nel corrispondente carattere.
+Prima di procedere all'inserimento o alla ricerca, il metodo \texttt{isValidChar} convalida l'appartenenza di ciascun carattere a $\Sigma$.
+
+\subsection{La Classe TrieNode}
+Ogni istanza della classe \texttt{TrieNode} definisce un nodo dell'albero ed è composta da due soli campi:
+\begin{itemize}
+    \item un array di riferimenti a nodi figli, denominato \texttt{children}, di dimensione fissa $|\Sigma| = 26$, in cui il valore \texttt{null} indica l'assenza di un arco uscente ($\perp$);
+    \item un valore booleano \texttt{isRepresentative}, che indica se il nodo rappresenta la terminazione di una parola.
+\end{itemize}
+Il nodo non memorizza esplicitamente la lettera al suo interno, poiché il carattere associato a un arco è implicito nella posizione dell'indice all'interno dell'array del nodo padre. Questa scelta permette di ridurre l'occupazione di memoria.
+
+\subsection{La Classe Trie}
+La classe \texttt{Trie} incapsula l'intero albero mantenendo il riferimento al nodo radice (\texttt{root}), che rappresenta concettualmente la stringa vuota $\varepsilon$. La classe fornisce i metodi per la manipolazione della struttura: le operazioni primitive $O(1)$ \texttt{child(v, c)} e \texttt{setChild(v, c, u)} per la navigazione e il collegamento dei nodi, le procedure ad alto livello \texttt{insert(S)} e \texttt{searchByPrefix(prefix)} per l'inserimento e l'autocompletamento, e il metodo ausiliario \texttt{countNodes()} per il conteggio ricorsivo dei nodi.
+
+
+\section{Descrizione della Soluzione Algoritmica}
+
+L'applicazione articola le proprie funzionalità in tre algoritmi principali: l'inserimento, la ricerca del prefisso con relativa estrazione ordinata dei risultati e la gestione del flusso di input/output.
+
+\subsection{Inserimento di una Parola (insert)}
+Il metodo \texttt{insert(String S)} inserisce una parola di lunghezza $m$ nel Trie operando in tre passi:
+\begin{enumerate}
+    \item \textbf{Convalida della stringa}: la stringa viene convertita in caratteri minuscoli rimuovendo eventuali spazi bianchi all'inizio e alla fine. Il metodo verifica poi che ogni carattere appartenga a $\Sigma$, sollevando un'eccezione se la parola risulta vuota o contiene caratteri non ammessi.
+    \item \textbf{Riuso del prefisso comune}: partendo dalla radice con un indice $j = 0$, un primo ciclo \texttt{while} fa avanzare il puntatore corrente $v$ lungo i rami già presenti finché ci sono ancora caratteri da esaminare ($j < m$) ed esiste già un arco uscente etichettato con la lettera corrente (\texttt{child(v, S[j]) != null}). Questa fase riutilizza il cammino comune più lungo senza allocare nuova memoria, arrestandosi sul nodo in cui termina il prefisso condiviso con le altre parole.
+    \item \textbf{Allocazione del suffisso}: a partire dal nodo raggiunto nel punto 2, un secondo ciclo \texttt{while} crea i rami mancanti finché ci sono ancora caratteri da inserire ($j < m$). In particolare a ogni passo alloca un nuovo \texttt{TrieNode} $u$, lo collega come figlio di $v$ lungo l'arco etichettato con la lettera corrente (\texttt{setChild(v, S[j], u)}) e fa avanzare il puntatore $v$ sul nuovo nodo $u$. Infine, una volta esaurita la parola, sul nodo terminale viene invocato \texttt{markAsRepresentative()}, impostando il relativo flag booleano a \texttt{true} per indicare che il cammino percorso individua una parola completa valida dell'insieme $R$.
+\end{enumerate}
+Se si prova ad inserire una parola già presente, il primo ciclo scorre l'intera parola, il secondo non alloca alcun nodo e l'istruzione finale si limita a confermare lo stato rappresentativo. In questo modo si garantisce la corretta gestione dei duplicati senza spreco di memoria.
+
+\subsection{Ricerca per Prefisso e Visita DFS (searchByPrefix)}
+L'operazione di completamento automatico non effettua alcuna scansione sequenziale del dizionario, ma individua tutti i suggerimenti in due fasi:
+\begin{enumerate}
+    \item \textbf{Discesa lungo il prefisso}: partendo dalla radice, un ciclo \texttt{for} scorre i caratteri del prefisso cercato accedendo a ogni passo al figlio corrispondente tramite \texttt{child(v, c)} in tempo costante $O(1)$. Se in qualunque momento si incontra un carattere non appartenente all'alfabeto $\Sigma$ o un arco nullo (\texttt{v == null}), il cammino si interrompe e la ricerca termina immediatamente restituendo una lista vuota. In questo modo si gestisce il caso di ricerche prive di riscontro senza mai scorrere il resto dell'albero. Se invece tutti i caratteri del prefisso sono presenti, il puntatore $v$ raggiunge la radice del sottoalbero contenente tutti e soli i vocaboli che iniziano con quel prefisso.
+    \item \textbf{Raccolta ordinata con visita DFS}: a partire dal nodo $v$ raggiunto nella prima fase, viene invocata la procedura ricorsiva \texttt{collectWordsDFS}, a cui vengono passati il nodo corrente, la lista in cui accumulare i suggerimenti e un buffer mutabile (\texttt{StringBuilder}) inizializzato con il prefisso cercato.
+\end{enumerate}
+La procedura ricorsiva esplora il sottoalbero operando in pre-ordine. Per prima cosa, infatti, si verifica se il nodo corrente è marcato come rappresentativo: in caso affermativo (\texttt{isRepresentative == true}), la sequenza di caratteri accumulata nel buffer individua una parola valida e viene immediatamente inserita nella lista dei suggerimenti.
+
+Successivamente un ciclo \texttt{for} esamina in ordine crescente tutti gli indici da 0 a 25. Per ogni arco esistente (\texttt{nextNode != null}), il metodo converte l'indice nel corrispondente carattere tramite \texttt{indexToChar}, lo aggiunge in coda al buffer (\texttt{append}) e richiama se stesso ricorsivamente sul nodo figlio. Al ritorno dalla chiamata ricorsiva, l'ultimo carattere inserito viene rimosso dal buffer (\texttt{deleteCharAt}).
+
+In questo modo l'algoritmo risolve per costruzione due requisiti della traccia, ovvero l'ordinamento alfabetico dei suggerimenti e il caso in cui il prefisso coincide con una parola completa.
+Infatti, poiché gli archi vengono esaminati nell'ordine alfabetico dei loro indici (dalla \texttt{'a'} alla \texttt{'z'}), la visita in profondità estrae le parole già ordinate lessicograficamente, senza richiedere una successiva operazione di ordinamento.
+
+Inoltre, nel caso in cui il prefisso digitato coincida esattamente con una parola memorizzata nel vocabolario (come \texttt{casa} a fronte delle parole \texttt{casa} e \texttt{casale}), il nodo di partenza della visita ha già \texttt{isRepresentative == true}: la procedura include quindi tale parola come primo suggerimento della lista prima di scendere ad esplorare le parole più lunghe.
+
+\subsection{Gestione dell'Input/Output (Classe Main)}
+La classe \texttt{Main} gestisce il flusso I/O. Il metodo \texttt{processInput} legge la prima riga per ottenere il numero intero $N$ di parole iniziali, inserisce le successive $N$ parole nel Trie e avvia un ciclo di ascolto continuo. Per ogni comando successivo:
+se riceve \texttt{PREFIX <prefisso>}, interroga il Trie e stampa i risultati, oppure la stringa \texttt{(nessun suggerimento)} se la lista è vuota;
+se riceve \texttt{INSERT <parola>}, aggiunge il termine al Trie ed emette la riga di conferma \texttt{Parola inserita: <parola>}.
+Il programma supporta sia l'esecuzione da file tramite argomento da terminale (\texttt{FileInputStream}), sia la modalità interattiva da tastiera (\texttt{System.in}).
+
+
+\section{Analisi della Complessità Computazionale}
+
+Per analizzare la complessità di tempo e di spazio della soluzione implementata, si considerano:
+
+\begin{itemize}
+    \item l'alfabeto supportato  $\Sigma = \{\text{'a'}, \dots, \text{'z'}\}$ ($|\Sigma| = 26$);
+    \item l'insieme $R$ delle $n$ parole memorizzate con lunghezza complessiva $||R|| = \sum_{S \in R} |S|$;
+    \item il prefisso cercato $P$ di lunghezza $|P|$;
+    \item il numero $k$ di risultati (suggerimenti) restituiti dalla ricerca per prefisso.
+
+\end{itemize}
+
+
+\subsection{Complessità Temporale}
+
+\paragraph{Inserimento (\texttt{insert}).}
+Ogni nodo del Trie è implementato con un array di dimensione fissa $|\Sigma| = 26$. Poiché la dimensione dell'alfabeto è costante, le operazioni di conversione del carattere in indice e di accesso o assegnazione del figlio (\texttt{child} e \texttt{setChild}) hanno costo costante $O(1)$.
+Inserire una parola $S$ di lunghezza $|S|$ consiste nel seguire il cammino dalla radice scandendo i caratteri di $S$ uno alla volta: finché i caratteri sono già presenti si scende lungo i nodi esistenti, mentre non appena si incontra un riferimento \texttt{null} si creano i nuovi nodi per i caratteri rimanenti. Poiché per ciascuno dei $|S|$ caratteri si svolge un numero costante di operazioni, con alfabeto di dimensione costante il costo per l'inserimento di una stringa $S$ è:
+\[
+    O(|S|)
+\]
+Nel caso di inserimento di una parola duplicata (già presente nel Trie), il primo ciclo scorre i $|S|$ nodi esistenti senza allocare nuovi nodi, mantenendo il costo $O(|S|)$. Di conseguenza, la costruzione del Trie per l'intero insieme di parole $R$ ha un costo temporale proporzionale alla lunghezza complessiva delle parole memorizzate:
+\[
+    O(||R||)
+\]
+
+\paragraph{Ricerca per prefisso (\texttt{searchByPrefix}).}
+La ricerca di una stringa in un Trie con alfabeto costante ha costo lineare nella sua lunghezza. Nel caso del completamento automatico, l'operazione si divide in due fasi:
+\begin{enumerate}
+    \item \textbf{Discesa lungo il prefisso:} partendo dalla radice, l'algoritmo segue il cammino corrispondente ai caratteri del prefisso $P$, effettuando a ogni passo un accesso \texttt{child(v, c)} in tempo $O(1)$. Questa fase richiede tempo $O(|P|)$ senza mai effettuare una scansione sequenziale del dizionario. Se il prefisso non è presente nel Trie (ricerca senza risultati, $k = 0$), il cammino si interrompe non appena si incontra un puntatore \texttt{null} e la ricerca termina immediatamente in tempo $O(|P|)$.
+    \item \textbf{Raccolta ordinata dei risultati (visita DFS):} se il prefisso è presente, dal nodo raggiunto parte la visita in profondità (\texttt{collectWordsDFS}) che esplora il sottoalbero del prefisso per raccogliere le $k$ parole corrispondenti. Per ciascun nodo visitato, il ciclo \texttt{for} controlla le $|\Sigma| = 26$ celle dell'array \texttt{children} in tempo costante $O(|\Sigma|) = O(1)$, aggiungendo alla lista dei suggerimenti le $k$ parole marcate come rappresentative.
+\end{enumerate}
+Il tempo richiesto dalla seconda fase dipende dal numero di risultati $k$ e dalla lunghezza delle parole trovate nel sottoalbero. Nel caso pessimo, in cui tutte le parole memorizzate nel dizionario iniziano con il prefisso cercato $P$, la visita esplora tutti i nodi del Trie impiegando tempo $O(||R||)$, per un costo complessivo nel caso pessimo pari a:
+\[
+    O(|P| + ||R||)
+\]
+Inoltre, poiché l'array dei figli è indicizzato alfabeticamente dalla \texttt{'a'} alla \texttt{'z'}, la visita restituisce i $k$ suggerimenti già ordinati lessicograficamente, senza dover eseguire alcun algoritmo di ordinamento aggiuntivo sui risultati.
+
+\subsection{Complessità Spaziale}
+
+\paragraph{Numero di nodi nel Trie.}
+Il numero esatto di nodi presenti in $trie(R)$ è stabilito dal seguente teorema:
+\[
+    ||R|| - \text{ELCP}(R) + 1
+\]
+dove $||R||$ è la lunghezza totale delle stringhe in $R$ ed $\text{ELCP}(R)$ indica la somma delle lunghezze dei prefissi comuni condivisi tra le parole dell'insieme $R$.
+Inoltre, se $R$ è un insieme di $n$ stringhe, il Trie non può avere più di $n$ nodi di biforcazione (\emph{branching}) e possiede $O(||R||)$ nodi unari:
+\begin{itemize}
+    \item Nel caso pessimo, in cui le parole memorizzate non condividono alcun prefisso comune ($\text{ELCP}(R) = 0$), il numero di nodi è massimo ed è pari a $||R|| + 1$, quindi $O(||R||)$.
+    \item Quando invece le parole condividono prefissi comuni ($\text{ELCP}(R) > 0$), i nodi dei prefissi vengono riutilizzati riducendo la memoria allocata; in particolare, l'inserimento di parole duplicate non crea alcun nuovo nodo.
+\end{itemize}
+
+\paragraph{Spazio complessivo occupato.}
+Poiché ogni nodo del Trie è implementato mediante un array di dimensione fissa $|\Sigma| = 26$ più una variabile booleana, e il numero totale di nodi è $O(||R||)$, lo spazio occupato dalla struttura dati è:
+\[
+    O(||R|| \cdot |\Sigma|) = O(||R||)
+\]
+Durante l'esecuzione della ricerca per prefisso \texttt{searchByPrefix}, la memoria ausiliaria utilizzata è data dallo \texttt{StringBuilder} e dallo stack delle chiamate ricorsive della visita DFS (proporzionali alla lunghezza della parola più lunga), oltre alla lista restituita in output che contiene le $k$ parole trovate (di dimensione nulla se $k = 0$, e al più $O(||R||)$ se vengono restituite tutte le parole del dizionario).
+
+\paragraph{Sintesi rispetto ai parametri del problema.}
+Riassumendo in funzione della lunghezza del prefisso $|P|$, del numero di risultati $k$ e della lunghezza complessiva delle parole memorizzate $||R||$:
+\begin{itemize}
+    \item \textbf{Complessità Temporale:} L'inserimento di tutte le parole nel Trie richiede tempo $O(||R||)$ (e $O(|S|)$ per ogni singola nuova parola $S$). La ricerca per prefisso richiede tempo $O(|P|)$ per individuare il sottoalbero (o per terminare se $k = 0$), a cui si somma il tempo di visita del sottoalbero per estrarre in ordine alfabetico i $k$ risultati, fino a un massimo di $O(|P| + ||R||)$ nel caso pessimo in cui tutte le parole memorizzate inizino con $P$.
+    \item \textbf{Complessità Spaziale:} Il Trie occupa uno spazio pari a $O(||R|| \cdot |\Sigma|) = O(||R||)$ distribuito su esattamente $||R|| - \text{ELCP}(R) + 1$ nodi, mentre la ricerca per prefisso richiede uno spazio di output proporzionale alla lunghezza complessiva dei $k$ risultati restituiti (nullo se $k = 0$, e al più $O(||R||)$).
+\end{itemize}
+
+
+\section{Correttezza della Soluzione Algoritmica}
+
+\subsection{Suite di Test di Unità (Classe TrieTest)}
+La correttezza dell'algoritmo e il rispetto dei requisiti della traccia sono stati verificati tramite una suite di nove test automatizzati con \textbf{JUnit 5}, implementati nella classe \texttt{TrieTest}.
+
+I primi test verificano il corretto funzionamento dei singoli nodi e la gestione dell'alfabeto. In particolare, \texttt{testNewNodeInitialization} e \texttt{testMarkAsRepresentative} controllano che ogni nuovo nodo nasca con tutti i riferimenti ai figli posti a \texttt{null} e non sia marcato come parola completa fino all'invocazione di \texttt{markAsRepresentative()}. Con \texttt{testAlphabetMappingAndValidation} viene invece verificata la conversione bidirezionale tra caratteri minuscoli e indici numerici in tempo $O(1)$, accertando che caratteri non supportati (come lettere maiuscole, numeri o simboli) vengano rifiutati sollevando un'eccezione.
+
+I test successivi si concentrano sul comportamento del Trie durante gli inserimenti e le ricerche, verificando anche tutti i casi limite previsti. Il metodo \texttt{testNodeCountTheorem} convalida la proprietà teorica sul numero totale di nodi ($||R|| - \text{ELCP}(R) + 1$): inserendo le sei parole d'esempio $R = \{\text{\texttt{ali}}, \text{\texttt{alice}}, \text{\texttt{anna}}, \text{\texttt{eliana}}, \text{\texttt{elias}}, \text{\texttt{elisa}}\}$, il conteggio tramite \texttt{countNodes()} restituisce esattamente $28 - 11 + 1 = 18$ nodi. La gestione dei duplicati viene collaudata da \texttt{testDuplicateWordsHandling}, che accerta come l'inserimento ripetuto di parole già presenti non crei nodi superflui né produca doppioni nell'output. I metodi \texttt{testPrefixIsCompleteWord} e \texttt{testAlphabeticalOrdering} verificano rispettivamente che un prefisso coincidente con una parola completa (come \texttt{casa} rispetto a \texttt{casale}) compaia tra i suggerimenti e che le parole vengano restituite sempre in ordine alfabetico, anche se inserite in ordine sparso o inverso. Infine, \texttt{testSearchWithNoResults} controlla che le ricerche prive di corrispondenza restituiscano immediatamente una lista vuota, mentre \texttt{testExamTraceExample} riproduce fedelmente l'intera sequenza di comandi riportata nella traccia d'esame.
+
+\subsection{Istruzioni per la Compilazione e l'Esecuzione}
+Per verificare il comportamento classe \texttt{Main}, sono forniti due file
+di test nella cartella \texttt{input/}:
+\texttt{input1\_traccia.txt} riproduce l'esempio della dato nella traccia del progetto per verificare
+il flusso base di esecuzione, mentre \texttt{input2\_completo.txt} è stato pensato per testare i casi
+limite del sistema, come prefissi coincidenti con parole complete (ad esempio \texttt{ali} e \texttt{alice}),
+l'inserimento di parole duplicate (\texttt{INSERT ali}) e ricerche
+senza corrispondenze nel dizionario (ad esempio\texttt{PREFIX zzz}).
+
+L'applicazione può essere compilata ed eseguita da terminale tramite i seguenti comandi:
+\begin{enumerate}
+    \item \textbf{Compilazione ed esecuzione dei test automatizzati:}
+    \begin{lstlisting}[language=bash]
+mvn clean test
+    \end{lstlisting}
+    \item \textbf{Esecuzione con i file di input:}
+    \begin{lstlisting}[language=bash]
+java -cp target/classes it.unipa.algoritmi.Main input/input1_traccia.txt
+java -cp target/classes it.unipa.algoritmi.Main input/input2_completo.txt
+    \end{lstlisting}
+    \item \textbf{Esecuzione interattiva da console:}
+    \begin{lstlisting}[language=bash]
+java -cp target/classes it.unipa.algoritmi.Main
+    \end{lstlisting}
+\end{enumerate}
+
+\end{document}

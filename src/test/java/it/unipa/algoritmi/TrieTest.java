@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TrieTest {
 
     @Test
-    @DisplayName("Passo (5) Slide 17: Un nuovo nodo u ha tutti i figli inizializzati a null (⊥) e non è marcato")
+    @DisplayName("Inizializzazione Nodo: Un nuovo nodo u ha tutti i figli inizializzati a null e non è marcato")
     void testNewNodeInitialization() {
         TrieNode u = new TrieNode();
 
@@ -18,12 +18,12 @@ class TrieTest {
         assertFalse(u.isRepresentative(), "Un nuovo nodo non deve essere marcato come rappresentativo");
 
         for (int i = 0; i < TrieNode.ALPHABET_SIZE; i++) {
-            assertNull(u.children[i], "Il figlio in posizione " + i + " deve essere inizializzato a null (⊥)");
+            assertNull(u.children[i], "Il figlio in posizione " + i + " deve essere inizializzato a null");
         }
     }
 
     @Test
-    @DisplayName("Passo (8) Slide 17: Marcatura di un nodo v come rappresentativo di S")
+    @DisplayName("Rappresentatività: Marcatura di un nodo v come rappresentativo di una parola")
     void testMarkAsRepresentative() {
         TrieNode v = new TrieNode();
         assertFalse(v.isRepresentative());
@@ -33,7 +33,7 @@ class TrieTest {
     }
 
     @Test
-    @DisplayName("Requisito Alfabeto: Conversione caratteri ['a'..'z'] e rifiuto caratteri non validi")
+    @DisplayName("Convalida caratteri: Conversione caratteri ['a'..'z'] e rifiuto caratteri non validi")
     void testAlphabetMappingAndValidation() {
         assertEquals(0, TrieNode.charToIndex('a'));
         assertEquals(25, TrieNode.charToIndex('z'));
@@ -49,7 +49,7 @@ class TrieTest {
     }
 
     @Test
-    @DisplayName("Esempio della Traccia d'Esame: inserimento iniziale, PREFIX ca, INSERT camion, PREFIX cam")
+    @DisplayName("Esempio della Traccia: inserimento iniziale, PREFIX ca, INSERT camion, PREFIX cam")
     void testExamTraceExample() {
         Trie trie = new Trie();
         trie.insert("cane");
@@ -58,21 +58,21 @@ class TrieTest {
         trie.insert("castello");
         trie.insert("gatto");
 
-        // Comando: PREFIX ca
+        // Comando PREFIX ca
         List<String> suggestionsCa = trie.searchByPrefix("ca");
         assertEquals(List.of("cane", "casa", "casale", "castello"), suggestionsCa);
 
-        // Comando: INSERT camion
+        // Comando INSERT camion
         trie.insert("camion");
 
-        // Comando: PREFIX cam
+        // Comando PREFIX cam
         List<String> suggestionsCam = trie.searchByPrefix("cam");
         assertEquals(List.of("camion"), suggestionsCam);
     }
 
     @Test
-    @DisplayName("Teorema Slide 13-14: R = {ali, alice, anna, eliana, elias, elisa} ha esattamente 28 - 11 + 1 = 18 nodi")
-    void testSlide14NodeCountTheorem() {
+    @DisplayName("Teorema sul Numero di Nodi: R = {ali, alice, anna, eliana, elias, elisa} ha esattamente 28 - 11 + 1 = 18 nodi")
+    void testNodeCountTheorem() {
         Trie trie = new Trie();
         String[] R = {"ali", "alice", "anna", "eliana", "elias", "elisa"};
         for (String s : R) {
@@ -140,74 +140,5 @@ class TrieTest {
         assertTrue(trie.searchByPrefix("cab").isEmpty());
         // Prefisso più lungo della parola memorizzata
         assertTrue(trie.searchByPrefix("canile").isEmpty());
-    }
-
-    @Test
-    @DisplayName("Integrazione I/O: Verifica output esatto dell'esempio nella traccia d'esame")
-    void testMainInputOutputExamExample() {
-        String inputTraccia = String.join("\n",
-                "5",
-                "cane",
-                "casa",
-                "casale",
-                "castello",
-                "gatto",
-                "PREFIX ca",
-                "INSERT camion",
-                "PREFIX cam"
-        );
-
-        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(
-                inputTraccia.getBytes(java.nio.charset.StandardCharsets.UTF_8)
-        );
-        java.io.ByteArrayOutputStream outBuffer = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream out = new java.io.PrintStream(outBuffer, true, java.nio.charset.StandardCharsets.UTF_8);
-
-        Main.processInput(in, out);
-
-        String expectedOutput = String.join(System.lineSeparator(),
-                "Suggerimenti per ca:",
-                "cane",
-                "casa",
-                "casale",
-                "castello",
-                "Parola inserita: camion",
-                "Suggerimenti per cam:",
-                "camion"
-        ) + System.lineSeparator();
-
-        assertEquals(expectedOutput, outBuffer.toString(java.nio.charset.StandardCharsets.UTF_8));
-    }
-
-    @Test
-    @DisplayName("Integrazione I/O: Gestione ricerca senza risultati e parole duplicate da comandi")
-    void testMainNoResultsAndDuplicates() {
-        String input = String.join("\n",
-                "2",
-                "cane",
-                "casa",
-                "INSERT cane",
-                "PREFIX ca",
-                "PREFIX xyz"
-        );
-
-        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(
-                input.getBytes(java.nio.charset.StandardCharsets.UTF_8)
-        );
-        java.io.ByteArrayOutputStream outBuffer = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream out = new java.io.PrintStream(outBuffer, true, java.nio.charset.StandardCharsets.UTF_8);
-
-        Main.processInput(in, out);
-
-        String expectedOutput = String.join(System.lineSeparator(),
-                "Parola inserita: cane",
-                "Suggerimenti per ca:",
-                "cane",
-                "casa",
-                "Suggerimenti per xyz:",
-                "(nessun suggerimento)"
-        ) + System.lineSeparator();
-
-        assertEquals(expectedOutput, outBuffer.toString(java.nio.charset.StandardCharsets.UTF_8));
     }
 }

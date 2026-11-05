@@ -8,8 +8,8 @@ public class TrieNode {
     /**
      * Dichiarazione esplicita dell'insieme di caratteri supportato Sigma = {'a'..'z'}.
      */
-    public static final char FIRST_CHAR = 'a';
-    public static final char LAST_CHAR = 'z';
+    public static final char FIRST_CHAR = 'a'; // 'a' -> 97
+    public static final char LAST_CHAR = 'z'; // 'z' -> 122
     public static final int ALPHABET_SIZE = LAST_CHAR - FIRST_CHAR + 1; // |Sigma| = 26
 
     /**
@@ -24,7 +24,7 @@ public class TrieNode {
     private boolean isRepresentative;
 
     /**
-     * Costruisce un nuovo nodo u inizializzando child(u, c) a \perp (null) per ogni c in Sigma.
+     * Costruisce un nuovo nodo u inizializzando child(u, c) a null per ogni c in Sigma.
      */
     public TrieNode() {
         this.children = new TrieNode[ALPHABET_SIZE];

@@ -41,7 +41,7 @@ autocomplete-trie/
     │   ├── Trie.java               # Logica dell'albero e algoritmi di ricerca
     │   └── Main.java               # Gestione I/O ed elaborazione comandi
     └── test/java/it/unipa/algoritmi/
-        └── TrieTest.java           # Test unitari e di integrazione (JUnit 5)
+        └── TrieTest.java           # Test unitari (JUnit 5)
 ```
 
 ---

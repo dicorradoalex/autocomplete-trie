@@ -1,0 +1,62 @@
+Università di Palermo
+Corso di Laurea in Informatica
+Esame di Laboratorio di Algoritmi
+Prova Orale - Appello del 10 Novembre 2026
+
+Utilizzando il linguaggio Java, risolvere il problema costruendo le classi necessarie e
+utilizzando le strutture dati più adatte.
+
+Un motore di ricerca deve suggerire parole che iniziano con la sequenza di caratteri
+digitata dall'utente.
+
+Implementare in Java un sistema di completamento automatico basato su una struttura
+Trie. Il programma deve consentire l'inserimento di parole e la ricerca di tutte le parole
+che iniziano con un prefisso indicato.
+
+Il programma deve
+1. inserire le parole in un Trie;
+2. ricevere un prefisso e restituire le parole corrispondenti;
+3. ordinare alfabeticamente i suggerimenti;
+4. consentire l'inserimento di nuove parole;
+5. gestire ricerche senza risultati e parole duplicate.
+
+La prima riga contiene il numero iniziale di parole, seguita da una parola per riga.
+Seguono comandi PREFIX prefisso e INSERT parola.
+
+Esempio di input
+5
+cane
+casa
+casale
+castello
+gatto
+PREFIX ca
+INSERT camion
+PREFIX cam
+
+Esempio di output
+Suggerimenti per ca:
+cane
+casa
+casale
+castello
+Parola inserita: camion
+Suggerimenti per cam:
+camion
+
+Requisiti
+Implementare il Trie senza effettuare una scansione sequenziale dell'intero dizionario
+per individuare il prefisso. Dichiarare l'insieme di caratteri supportato e gestire il caso in
+cui il prefisso coincida con una parola completa.
+
+Analisi richiesta
+Analizzare tempo e spazio in funzione della lunghezza del prefisso, del numero di
+risultati e della lunghezza complessiva delle parole memorizzate.
+
+Nota: Il codice funzionante, opportunamente commentato e completo di tutte le
+librerie necessarie per la corretta compilazione e un insieme di input su cui testarne
+l'esecuzione, deve essere inviato, insieme ad una relazione che descrive la
+soluzione algoritmica, la sua correttezza, la complessità di tempo e spazio e le
+strutture dati utilizzate, entro e non oltre le ore 14:00 del 6 Novembre 2026
+all'indirizzo mariella.bonomo@unipa.it, specificando in oggetto SOLUZIONE PROVA
+ORALE - APPELLO DEL 10 novembre 2026.

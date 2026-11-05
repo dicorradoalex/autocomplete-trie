@@ -1,0 +1,56 @@
+\ProvidesPackage{common}
+
+% Gestione della lingua e codifica
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% Layout e Geometria pagina
+\usepackage[a4paper, margin=2.5cm]{geometry}
+
+% Pacchetti per il workflow modulare
+\usepackage{subfiles}
+
+% Layout e Tipografia
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+
+% Figure e Tabelle
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{siunitx}
+
+% Grafici e Diagrammi
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+% Codice e Algoritmi
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% Configurazione stile per Listings (Java / Pseudocodice)
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{teal},
+    frame=single,
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=7pt
+}
+
+% Comandi personalizzati
+\newcommand{\dashedrightarrow}{\mathrel{
+    \text{\tikz[baseline] \draw[dashed,->] (0pt,0.5ex) -- (1em,0.5ex);}
+}}

@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Main {
 
     /**
-     * Punto di ingresso dell'applicazione.
+     * Classe Main.
      * Se viene fornito un argomento da riga di comando, lo interpreta come percorso di un file di input;
      * altrimenti legge dallo standard input (System.in).
      *

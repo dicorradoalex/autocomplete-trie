@@ -1,0 +1,23 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {section}{\numberline {1}Introduzione e Specifiche del Problema}{2}{section.1}%
+\contentsline {section}{\numberline {2}Struttura Dati Utilizzata e Implementazione}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Motivazione della scelta}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Alfabeto Supportato}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}La Classe TrieNode}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}La Classe Trie}{3}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Descrizione della Soluzione Algoritmica}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Inserimento di una Parola (insert)}{3}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Ricerca per Prefisso e Visita DFS (searchByPrefix)}{4}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Gestione dell'Input/Output (Classe Main)}{4}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Analisi della Complessità Computazionale}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Complessità Temporale}{5}{subsection.4.1}%
+\contentsline {paragraph}{Inserimento (\texttt {insert}).}{5}{paragraph*.1}%
+\contentsline {paragraph}{Ricerca per prefisso (\texttt {searchByPrefix}).}{5}{paragraph*.2}%
+\contentsline {subsection}{\numberline {4.2}Complessità Spaziale}{6}{subsection.4.2}%
+\contentsline {paragraph}{Numero di nodi nel Trie.}{6}{paragraph*.3}%
+\contentsline {paragraph}{Spazio complessivo occupato.}{6}{paragraph*.4}%
+\contentsline {paragraph}{Sintesi rispetto ai parametri del problema.}{6}{paragraph*.5}%
+\contentsline {section}{\numberline {5}Verifica Sperimentale e Guida all'Uso}{6}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Suite di Test di Unità (Classe TrieTest)}{6}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Istruzioni per la Compilazione e l'Esecuzione}{7}{subsection.5.2}%
